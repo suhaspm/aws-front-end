@@ -2,7 +2,7 @@ name: Deploy Frontend to EC2
 
 on:
   push:
-    branches: [main]
+    branches: [master]
 
 jobs:
   deploy:
@@ -31,7 +31,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "./front-end.zip"
-        target: "~/front-end.zip"
+        target: "~/"
 
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
@@ -52,7 +52,6 @@ jobs:
           echo "Unzipping new front end code..."
           # Ensure we remove the old zip first if it exists, before unzipping a new one
           rm -f ~/front-end.zip
-          mkdir -p ~/front-end 
           unzip -o ~/front-end.zip -d ~/ 
 
           if [ $? -ne 0 ]; then
