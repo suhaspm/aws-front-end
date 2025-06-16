@@ -53,9 +53,9 @@ jobs:
           docker stop front-end || true
           docker rm front-end || true
 
-      #     echo "Cleaning up old frontend deployment artifacts..."
-      #     # Forcefully remove previous app folder
-      #     sudo rm -rf /home/ec2-user/front-end || true
+          echo "Cleaning up old frontend deployment artifacts..."
+          # Forcefully remove previous app folder
+          sudo rm -rf /home/ec2-user/front-end || true
 
       #     # Forcefully remove the temporary transfer directory created by ssh-action
       #     sudo rm -rf /home/ec2-user/front-end-tmp-dir || true
