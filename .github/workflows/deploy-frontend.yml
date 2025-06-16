@@ -13,40 +13,16 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Archive Frontend
-      run: zip -r front-end.zip . -x '*.git*'
+    - name: Install Frontend Dependencies
+      run: npm install # Or 'yarn install'
+      working-directory: ./front-end
 
-    - name: Upload zip and deploy via SSH
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        script: | 
-          set -e
+    - name: Build Frontend for Production
+      run: npm run build # Or 'yarn build'
+      working-directory: ./front-end
 
-          echo "Stopping and removing old frontend container..."
-          docker stop front-end || true
-          docker rm front-end || true
-
-          echo "Removing old frontend folder..."
-          sudo rm -rf ~/front-end
-
-          echo "Unzipping new front end code..."
-          rm -f ~/front-end.zip
-          exit_code=0
-          unzip -o ~/front-end.zip -d ~/front-end || exit_code=$?
-          if[$exit_code -ne 0]; then
-            echo "Unzip failed!"
-            exit 1
-          fi
-
-          echo "Building new Docker image..."
-          cd ~/front-end
-          docker build -t front-end .
-
-          echo "Running new docker container..."
-          docker run -d --name front-end -p 3000:80 front-end
+    - name: Archive Frontend Folder
+      run: zip -r front-end.zip front-end -x 'front-end/.git*'
 
     - name: Copy zip to EC2
       uses: appleboy/scp-action@v0.1.4
@@ -56,3 +32,36 @@ jobs:
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "./front-end.zip"
         target: "~/front-end.zip"
+
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        script: |
+          set -e 
+
+          echo "Stopping and removing old frontend container..."
+          docker stop front-end || true 
+          docker rm front-end || true
+
+          echo "Removing old frontend folder..."
+          sudo rm -rf ~/front-end
+
+          echo "Unzipping new front end code..."
+          # Ensure we remove the old zip first if it exists, before unzipping a new one
+          rm -f ~/front-end.zip
+          mkdir -p ~/front-end 
+          unzip -o ~/front-end.zip -d ~/ 
+
+          if [ $? -ne 0 ]; then
+            echo "Unzip failed!"
+            exit 1
+          fi    
+          echo "Building new Docker image..."
+          cd ~/front-end
+          docker build -t front-end .
+
+          echo "Running new docker container..."
+          docker run -d --name front-end -p 3000:80 front-end
