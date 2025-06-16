@@ -56,19 +56,16 @@ jobs:
           echo "Cleaning up old frontend deployment artifacts..."
           # Forcefully remove previous app folder
           sudo rm -rf /home/ec2-user/front-end || true
-          echo "Listing files..."
-          ls
           unzip front-end
           cd front-end
+          echo "Building new Docker image..."
+          docker build -t front-end .
+
+          echo "Running new docker container..."
+          docker run -d --name front-end -p 3000:80 front-end
+          cd ..
       #     # Forcefully remove the temporary transfer directory created by ssh-action
       #     sudo rm -rf /home/ec2-user/front-end-tmp-dir || true
 
       #     echo "Moving and setting up new front end code..."
       #     mv /home/ec2-user/front-end-tmp-dir /home/ec2-user/front-end
-
-      #     echo "Building new Docker image..."
-      #     cd /home/ec2-user/front-end
-      #     docker build -t front-end .
-
-      #     echo "Running new docker container..."
-      #     docker run -d --name front-end -p 3000:80 front-end
