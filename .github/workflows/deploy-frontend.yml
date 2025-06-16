@@ -13,12 +13,17 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
     - name: Install Frontend Dependencies
-      run: npm install # Or 'yarn install'
+      run: npm install
       working-directory: ./front-end
 
     - name: Build Frontend for Production
-      run: npm run build # Or 'yarn build'
+      run: npm run build
       working-directory: ./front-end
 
     - name: Archive Frontend Folder
@@ -26,12 +31,12 @@ jobs:
 
     - name: Copy zip to EC2
       uses: appleboy/scp-action@v0.1.4
-      with: 
+      with:
         host: ${{ secrets.EC2_HOST }}
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "./front-end.zip"
-        target: "~/front-end.zip"
+        target: "/tmp/front-end.zip"
 
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
@@ -43,24 +48,31 @@ jobs:
           set -e 
 
           echo "Stopping and removing old frontend container..."
-          docker stop front-end || true 
+          docker stop front-end || true
           docker rm front-end || true
 
           echo "Removing old frontend folder..."
-          sudo rm -rf ~/front-end
+          sudo rm -rf /home/ec2-user/front-end 
 
-          echo "Unzipping new front end code..."
-          # Ensure we remove the old zip first if it exists, before unzipping a new one
-          rm -f ~/front-end.zip
-          mkdir -p ~/front-end 
-          unzip -o ~/front-end.zip -d ~/ 
+          echo "Unzipping new front end code from temporary location..."
+          rm -f /home/ec2-user/front-end.zip 
+          rm -f /tmp/front-end.zip 
+
+          mkdir -p /home/ec2-user/front-end
+
+          mv /tmp/front-end.zip /home/ec2-user/front-end.zip 
+
+          unzip -o /home/ec2-user/front-end.zip -d /home/ec2-user/ 
 
           if [ $? -ne 0 ]; then
             echo "Unzip failed!"
             exit 1
-          fi    
+          fi
+
+          rm -f /home/ec2-user/front-end.zip
+
           echo "Building new Docker image..."
-          cd ~/front-end
+          cd /home/ec2-user/front-end
           docker build -t front-end .
 
           echo "Running new docker container..."
