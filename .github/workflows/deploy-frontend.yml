@@ -26,8 +26,8 @@ jobs:
       run: npm run build
       working-directory: ./front-end
 
-    # - name: Archive Frontend Folder
-    #   run: zip -r front-end.zip front-end -x 'front-end/.git*'
+    - name: Archive Frontend Folder
+      run: zip -r front-end.zip front-end -x 'front-end/.git*'
     
     - name: Copy zip to EC2
       uses: appleboy/scp-action@v0.1.4
