@@ -38,34 +38,34 @@ jobs:
     #     source: "./front-end.zip"
     #     target: "/tmp/front-end.zip"
 
-    - name: Deploy via SSH
-      uses: appleboy/ssh-action@v1.0.3
-      with:
-        host: ${{ secrets.EC2_HOST }}
-        username: ${{ secrets.EC2_USER }}
-        key: ${{ secrets.EC2_SSH_KEY }}
-        source: "front-end"
-        target: "/home/ec2-user/front-end-tmp-dir"
-        script: |
-          set -e # Exit immediately if a command exits with a non-zero status.
+    # - name: Deploy via SSH
+      # uses: appleboy/ssh-action@v1.0.3
+      # with:
+      #   host: ${{ secrets.EC2_HOST }}
+      #   username: ${{ secrets.EC2_USER }}
+      #   key: ${{ secrets.EC2_SSH_KEY }}
+      #   source: "front-end"
+      #   target: "/home/ec2-user/front-end-tmp-dir"
+      #   script: |
+      #     set -e # Exit immediately if a command exits with a non-zero status.
 
-          echo "Stopping and removing old frontend container..."
-          docker stop front-end || true
-          docker rm front-end || true
+      #     echo "Stopping and removing old frontend container..."
+      #     docker stop front-end || true
+      #     docker rm front-end || true
 
-          echo "Cleaning up old frontend deployment artifacts..."
-          # Forcefully remove previous app folder
-          sudo rm -rf /home/ec2-user/front-end || true
+      #     echo "Cleaning up old frontend deployment artifacts..."
+      #     # Forcefully remove previous app folder
+      #     sudo rm -rf /home/ec2-user/front-end || true
 
-          # Forcefully remove the temporary transfer directory created by ssh-action
-          sudo rm -rf /home/ec2-user/front-end-tmp-dir || true
+      #     # Forcefully remove the temporary transfer directory created by ssh-action
+      #     sudo rm -rf /home/ec2-user/front-end-tmp-dir || true
 
-          echo "Moving and setting up new front end code..."
-          mv /home/ec2-user/front-end-tmp-dir /home/ec2-user/front-end
+      #     echo "Moving and setting up new front end code..."
+      #     mv /home/ec2-user/front-end-tmp-dir /home/ec2-user/front-end
 
-          echo "Building new Docker image..."
-          cd /home/ec2-user/front-end
-          docker build -t front-end .
+      #     echo "Building new Docker image..."
+      #     cd /home/ec2-user/front-end
+      #     docker build -t front-end .
 
-          echo "Running new docker container..."
-          docker run -d --name front-end -p 3000:80 front-end
+      #     echo "Running new docker container..."
+      #     docker run -d --name front-end -p 3000:80 front-end

@@ -19,7 +19,7 @@ const UploadComponent = () => {
     formData.append('file', file);
 
     try {
-      const res = await fetch('https://3.77.73.3:8080/api/upload', {
+      const res = await fetch('/api/upload', {
         method: 'POST',
         body: formData,
       });
