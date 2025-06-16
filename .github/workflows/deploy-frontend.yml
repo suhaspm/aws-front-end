@@ -55,8 +55,8 @@ jobs:
           sudo rm -rf /home/ec2-user/front-end 
 
           echo "Unzipping new front end code from temporary location..."
-          rm -f /home/ec2-user/front-end.zip 
-          rm -f /tmp/front-end.zip 
+          sudo rm -rf /home/ec2-user/front-end.zip 
+          sudo rm -rf /tmp/front-end.zip 
 
           mkdir -p /home/ec2-user/front-end
 
@@ -69,7 +69,7 @@ jobs:
             exit 1
           fi
 
-          rm -f /home/ec2-user/front-end.zip
+          sudo rm -rf /home/ec2-user/front-end.zip
 
           echo "Building new Docker image..."
           cd /home/ec2-user/front-end
