@@ -7,7 +7,7 @@ const DeploymentsList = () => {
   useEffect(() => {
     const fetchDeployments = async () => {
       try {
-        const response = await axios.get('http://3.77.73.3:8080/api/deployments');
+        const response = await axios.get('https://3.77.73.3:8080/api/deployments');
         console.log('Fetched deployments:', response.data);
         setDeployments(response.data);
       } catch (error) {

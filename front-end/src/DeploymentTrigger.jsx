@@ -6,7 +6,7 @@ function DeploymentTrigger() {
 
   const handleCreateDeployment = async () => {
     try {
-      const res = await axios.post('http://localhost:8080/api/create-deployment');
+      const res = await axios.post('https://localhost:8080/api/create-deployment');
       setResponse(res.data);
     } catch (error) {
       setResponse(`Error: ${error.response?.data || error.message}`);
