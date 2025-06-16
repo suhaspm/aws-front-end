@@ -38,20 +38,20 @@ jobs:
     #     source: "./front-end.zip"
     #     target: "/tmp/front-end.zip"
 
-    # - name: Deploy via SSH
-      # uses: appleboy/ssh-action@v1.0.3
-      # with:
-      #   host: ${{ secrets.EC2_HOST }}
-      #   username: ${{ secrets.EC2_USER }}
-      #   key: ${{ secrets.EC2_SSH_KEY }}
-      #   source: "front-end"
-      #   target: "/home/ec2-user/front-end-tmp-dir"
-      #   script: |
-      #     set -e # Exit immediately if a command exits with a non-zero status.
+    - name: Deploy via SSH
+      uses: appleboy/ssh-action@v1.0.3
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "./front-end"
+        target: "/home/ec2-user"
+        script: |
+          set -e # Exit immediately if a command exits with a non-zero status.
 
-      #     echo "Stopping and removing old frontend container..."
-      #     docker stop front-end || true
-      #     docker rm front-end || true
+          echo "Stopping and removing old frontend container..."
+          docker stop front-end || true
+          docker rm front-end || true
 
       #     echo "Cleaning up old frontend deployment artifacts..."
       #     # Forcefully remove previous app folder
