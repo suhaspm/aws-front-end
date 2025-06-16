@@ -13,6 +13,11 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
+    - name: Install Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+
     - name: Install Frontend Dependencies
       run: npm install # Or 'yarn install'
       working-directory: ./front-end
@@ -31,7 +36,7 @@ jobs:
         username: ${{ secrets.EC2_USER }}
         key: ${{ secrets.EC2_SSH_KEY }}
         source: "./front-end.zip"
-        target: "~/"
+        target: "/tmp/front-end.zip"
 
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
@@ -47,19 +52,22 @@ jobs:
           docker rm front-end || true
 
           echo "Removing old frontend folder..."
-          sudo rm -rf ~/front-end
+          sudo rm -rf /home/ec2-user/front-end
+          sudo rm -rf /tmp/front-end.zip
+          mkdir -p /home/ec2-user/front-end
+          my /tmp/front-end.zip /home/ec2-user/front-end.zip
 
           echo "Unzipping new front end code..."
           # Ensure we remove the old zip first if it exists, before unzipping a new one
-          rm -f ~/front-end.zip
-          unzip -o ~/front-end.zip -d ~/ 
+          unzip -o /home/ec2-user/front-end.zip -d /home/ec2-user/
 
           if [ $? -ne 0 ]; then
             echo "Unzip failed!"
             exit 1
           fi    
           echo "Building new Docker image..."
-          cd ~/front-end
+          rm -f /home/ec2-user/front-end.zip
+          cd /home/ec2-user/front-end
           docker build -t front-end .
 
           echo "Running new docker container..."
