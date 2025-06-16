@@ -28,15 +28,15 @@ jobs:
 
     # - name: Archive Frontend Folder
     #   run: zip -r front-end.zip front-end -x 'front-end/.git*'
-
-    # - name: Copy zip to EC2
-    #   uses: appleboy/scp-action@v0.1.4
-    #   with:
-    #     host: ${{ secrets.EC2_HOST }}
-    #     username: ${{ secrets.EC2_USER }}
-    #     key: ${{ secrets.EC2_SSH_KEY }}
-    #     source: "./front-end.zip"
-    #     target: "/tmp/front-end.zip"
+    
+    - name: Copy zip to EC2
+      uses: appleboy/scp-action@v0.1.4
+      with:
+        host: ${{ secrets.EC2_HOST }}
+        username: ${{ secrets.EC2_USER }}
+        key: ${{ secrets.EC2_SSH_KEY }}
+        source: "./front-end.zip"
+        target: "~/front-end.zip"
 
     - name: Deploy via SSH
       uses: appleboy/ssh-action@v1.0.3
@@ -56,7 +56,6 @@ jobs:
           echo "Cleaning up old frontend deployment artifacts..."
           # Forcefully remove previous app folder
           sudo rm -rf /home/ec2-user/front-end || true
-
       #     # Forcefully remove the temporary transfer directory created by ssh-action
       #     sudo rm -rf /home/ec2-user/front-end-tmp-dir || true
 
